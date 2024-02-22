@@ -15,11 +15,13 @@ int main() {
 
 
    int number;
-   char *data = "";
    size_t bufsize = 0;  // getline will allocate the buffer
    int index;
    int times;
    size_t size;
+   int sorted;
+   char **words_array;
+
 
 
     // Get chars from the user until he is asking to stop
@@ -28,7 +30,7 @@ int main() {
         // Scan a number
         scanf("%d", &number);
 
-        // Checking witch char we got
+        // Checking witch number we got
         switch (number) {
 
             case 1:
@@ -39,14 +41,11 @@ int main() {
                 bufsize = 0;
 
                 getline(&inputLine, &bufsize, stdin);
-                char **words_array;
 
                 parse_line_into_words(inputLine, times, &words_array);
 
                 for(int i = 0; i < times; i++){
-                    data = words_array[i];
-//                    printf("%s data\n", data);
-                    StrList_insertLast(StrList, data);
+                    StrList_insertLast(StrList, words_array[i]);
                     free(words_array[i]);
                 }
                 free(words_array);
@@ -55,8 +54,16 @@ int main() {
                 break;
 
             case 2:
-                scanf(" %d  %s", &index, data);
-                StrList_insertAt(StrList, data, index);
+                scanf("\n%d\n", &index);
+
+                char *inputWord2 = NULL;
+                bufsize = 0;
+
+                getline(&inputWord2, &bufsize, stdin);
+
+                parse_line_into_words(inputWord2, 1, &words_array);
+
+                StrList_insertAt(StrList, words_array[0], index);
                 break;
 
             case 3:
@@ -64,30 +71,45 @@ int main() {
                 break;
 
             case 4:
-                printf(" %zu", StrList_size(StrList));
+                printf("%zu\n", StrList_size(StrList));
                 break;
 
             case 5:
-                scanf(" %d", &index);
+                scanf("\n%d\n", &index);
                 StrList_printAt(StrList, index);
                 break;
 
             case 6:
-                printf(" %d", StrList_printLen(StrList));
+                printf("%d\n", StrList_printLen(StrList));
                 break;
 
             case 7:
-                scanf(" %s", data);
-                StrList_count(StrList, data);
+                bufsize = 0;
+                char *inputWord7 = NULL;
+                scanf("\n");
+                getline(&inputWord7, &bufsize, stdin);
+                parse_line_into_words(inputWord7, 1, &words_array);
+
+                int count = StrList_count(StrList, words_array[0]);
+                printf("%d\n", count);
+                scanf("\n");
                 break;
 
             case 8:
-                scanf(" %s", data);
-                StrList_remove(StrList, data);
+                bufsize = 0;
+                char *inputWord8 = NULL;
+                scanf("\n");
+
+                getline(&inputWord8, &bufsize, stdin);
+                parse_line_into_words(inputWord8, 1, &words_array);
+
+                StrList_remove(StrList, words_array[0]);
+                scanf("\n");
+
                 break;
 
             case 9:
-                scanf(" %d", &index);
+                scanf("\n%d\n", &index);
                 StrList_removeAt(StrList, index);
                 break;
 
@@ -108,12 +130,18 @@ int main() {
                 break;
 
             case 13:
-                StrList_isSorted(StrList);
+
+                sorted = StrList_isSorted(StrList);
+                if(sorted == True){
+                    printf("true\n");
+                }
+                else{
+                    printf("false\n");
+                }
                 break;
 
             case 0:
-                printf("\n");
-                //StrList_free(StrList);
+                StrList_free(StrList);
                 return 0;
         }
 

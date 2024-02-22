@@ -17,7 +17,15 @@ Node* Node_alloc(const char* data, Node* next) {
         return NULL;
     }
 
-    n->_data = data;
+    char* data_recv = (char*)malloc(sizeof(char)*(strlen(data) + 1));
+
+    if(data_recv == NULL){
+        return NULL;
+    }
+
+    strcpy(data_recv, data);
+
+    n->_data = data_recv;
     n->_next = next;
     return n;
 }
@@ -89,12 +97,28 @@ void StrList_insertLast(StrList* StrList, const char* data){
 //    printf("data %s\n", data);
 //    StrList_printAt(StrList, (int) StrList_size(StrList) - 1);
 
+//    // Create a new node
+//    Node *new_node = (Node *)malloc(sizeof(Node));
+//    new_node->_data = data;
+//    new_node->_next = NULL;
+//
+//    // Add the new node to the end of the list
+//    if (StrList->_head == NULL) {
+//        StrList->_head = new_node;
+//    } else {
+//        Node *current_node = StrList->_head;
+//        while (current_node->_next != NULL) {
+//            current_node = current_node->_next;
+//        }
+//        current_node->_next = new_node;
+//    }
+
 }
 
 /*
 * Inserts an element at given index
 */
-void StrList_insertAt(StrList* StrList, const char* data,int index) {
+void StrList_insertAt(StrList* StrList, const char* data, int index) {
 
     //Out of range index
     if (index < 0 || index > StrList->_size) {
@@ -102,7 +126,9 @@ void StrList_insertAt(StrList* StrList, const char* data,int index) {
     }
 
     Node *node = Node_alloc(data, NULL);
+    //node->_data = realloc(&data, sizeof(char*) * strlen(data));
     //printf("something %s", node->_data);
+    //printf("here");
 
     if(index == 0){
         node->_next = StrList->_head;
@@ -118,7 +144,7 @@ void StrList_insertAt(StrList* StrList, const char* data,int index) {
         current_node->_next = node;
     }
 
-    StrList->_size++;
+    StrList->_size = StrList->_size + 1;
 
 }
 
@@ -133,13 +159,17 @@ char* StrList_firstData(const StrList* StrList){
  * Prints the StrList to the standard output.
  */
 void StrList_print(const StrList* StrList){
+
+    if(StrList->_head == NULL){
+        return;
+    }
     Node* current_node = StrList->_head;
 
     for(int i = 0; i < StrList->_size - 1; i++){
         printf("%s ", current_node->_data);
         current_node = current_node->_next;
     }
-    printf("%s", current_node->_data);
+    printf("%s\n", current_node->_data);
 
 }
 
@@ -155,7 +185,7 @@ void StrList_printAt(const StrList* Strlist,int index){
 
     Node* current_node = Strlist->_head;
 
-    for(int i = 0; i < index - 1; i++){
+    for(int i = 0; i < index; i++){
         current_node = current_node->_next;
     }
 
@@ -187,7 +217,7 @@ int StrList_count(StrList* StrList, const char* data){
     Node* current_node = StrList->_head;
 
     for(int i = 0; i < StrList->_size; i++){
-        if(strcmp(data, current_node->_data)){
+        if(strcmp(data, current_node->_data) == 0){
             counter++;
         }
         current_node = current_node->_next;
@@ -205,7 +235,7 @@ void StrList_remove(StrList* StrList, const char* data){
     Node* previous_node = NULL;
 
     while(current_node != NULL){
-        if(strcmp(data, current_node->_data)){
+        if(strcmp(data, current_node->_data) == 0){
             if(previous_node == NULL){
                 StrList->_head = current_node->_next;
                 free(current_node);
@@ -240,23 +270,21 @@ void StrList_removeAt(StrList* StrList, int index){
         return;
     }
 
-    Node* current_node = StrList->_head;
-    Node* previous_node = NULL;
-
-    for(int i = 0; i < index; i++){
-        previous_node = current_node;
-        current_node = current_node->_next;
+    if (index == 0) {
+        Node *p = StrList->_head;
+        StrList->_head = p->_next;
+        Node_free(p);
+        StrList->_size--;
+    } else {
+        Node *p = StrList->_head;
+        for (int i = 0; i < index - 1; i++) {
+            p = p->_next;
+        }
+        Node *next = p->_next;
+        p->_next = next->_next;
+        Node_free(next);
+        StrList->_size--;
     }
-
-    if(previous_node == NULL){
-        StrList->_head = current_node->_next;
-    }
-    else{
-        previous_node->_next = current_node->_next;
-    }
-
-    free(current_node);
-    StrList->_size--;
 }
 
 /*
